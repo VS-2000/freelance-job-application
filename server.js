@@ -1,0 +1,42 @@
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("./config/db");
+
+dotenv.config();
+connectDB();
+
+const app = express();
+
+app.use(cors());
+
+// Stripe Webhook needs raw body before express.json()
+app.use(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" })
+);
+
+app.use(express.json());
+
+// ROUTES
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/jobs", require("./routes/jobRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes")); // ✅ STRIPE
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+
+app.get("/", (req, res) => {
+  res.send("Freelance Platform API is running");
+});
+
+// ERROR HANDLERS
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);

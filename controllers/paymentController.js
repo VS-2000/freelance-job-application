@@ -1,0 +1,54 @@
+const Stripe = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const Payment = require("../models/Payment");
+
+/**
+ * CREATE STRIPE PAYMENT INTENT
+ */
+const createPayment = async (req, res) => {
+  try {
+    const { amount, jobId, freelancerId } = req.body;
+
+    if (!amount || !jobId) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment amount and Job ID are required",
+      });
+    }
+
+    // 1. Create a "pending" payment record in our DB first
+    const newPayment = await Payment.create({
+      job: jobId,
+      client: req.user._id, // From 'protect' middleware
+      freelancer: freelancerId,
+      amount: amount,
+      status: "escrow", // Or "pending"
+    });
+
+    // 2. Create Stripe PaymentIntent with metadata
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100, // INR → paise
+      currency: "inr",
+      payment_method_types: ["card"],
+      metadata: {
+        paymentId: newPayment._id.toString(),
+        jobId: jobId,
+        clientId: req.user._id.toString(),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Stripe payment intent created and recorded",
+      clientSecret: paymentIntent.client_secret,
+      paymentId: newPayment._id,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { createPayment };
