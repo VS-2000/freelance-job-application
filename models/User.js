@@ -13,20 +13,39 @@ const userSchema = new mongoose.Schema(
       default: "client",
     },
 
+    profilePicture: {
+      type: String,
+      default: ""
+    },
+
+    // PROFILE FIELDS
+    title: String,
+    bio: String,
+    location: String,
+    hourlyRate: Number,
     skills: [String],
-    portfolio: String,
+    portfolio: [
+      {
+        title: String,
+        description: String,
+        link: String,
+        imageUrl: String
+      }
+    ],
 
     isVerified: {
       type: Boolean,
-      default: false, // Admin approves freelancers
+      default: false,
     },
   },
   { timestamps: true }
 );
 
 // Encrypt password before save
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
   this.password = await bcrypt.hash(this.password, 10);
 });
 

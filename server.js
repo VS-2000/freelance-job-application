@@ -17,6 +17,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ROUTES
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -25,6 +26,9 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes")); // ✅ STRIPE
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/proposals", require("./routes/proposalRoutes"));
+app.use("/api/contact", require("./routes/contactRoutes"));
 
 app.get("/", (req, res) => {
   res.send("Freelance Platform API is running");

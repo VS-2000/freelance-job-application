@@ -7,6 +7,10 @@ exports.submitProposal = async (req, res) => {
     return res.status(403).json({ message: "Only freelancers can bid" });
   }
 
+  if (!req.user.isVerified) {
+    return res.status(403).json({ message: "Only admin-verified freelancers can submit proposals." });
+  }
+
   const job = await Job.findById(req.body.jobId);
   if (!job) return res.status(404).json({ message: "Job not found" });
 

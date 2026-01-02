@@ -51,4 +51,47 @@ const createPayment = async (req, res) => {
   }
 };
 
-module.exports = { createPayment };
+/**
+ * SIMULATE PAYMENT (For Demo Purposes)
+ * Bypasses Stripe and directly approves the job/payment
+ */
+const simulatePayment = async (req, res) => {
+  try {
+    const { amount, jobId, freelancerId } = req.body;
+    const Job = require("../models/Job");
+
+    if (!amount || !jobId) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment amount and Job ID are required",
+      });
+    }
+
+    // 1. Create an "escrow" payment record
+    const newPayment = await Payment.create({
+      job: jobId,
+      client: req.user._id,
+      freelancer: freelancerId,
+      amount: amount,
+      status: "escrow",
+      transactionId: "DEMO-" + Date.now(),
+    });
+
+    // 2. Update Job status to "in-progress" if it wasn't already
+    await Job.findByIdAndUpdate(jobId, { status: "in-progress" });
+
+    res.status(200).json({
+      success: true,
+      message: "Payment simulated successfully",
+      paymentId: newPayment._id,
+    });
+  } catch (error) {
+    console.error("Simulation Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { createPayment, simulatePayment };

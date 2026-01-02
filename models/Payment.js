@@ -18,7 +18,7 @@ const paymentSchema = new mongoose.Schema(
     amount: Number,
     status: {
       type: String,
-      enum: ["escrow", "released"],
+      enum: ["escrow", "released", "failed"],
       default: "escrow",
     },
   },

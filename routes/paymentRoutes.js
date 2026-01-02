@@ -11,4 +11,7 @@ router.post("/create", protect, createPayment);
 // STRIPE WEBHOOK
 router.post("/webhook", stripeWebhook);
 
+// SIMULATE PAYMENT (DEMO)
+router.post("/simulate", protect, createPayment.simulatePayment || require("../controllers/paymentController").simulatePayment);
+
 module.exports = router;

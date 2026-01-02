@@ -1,11 +1,12 @@
 const express = require("express");
-const { getProfile } = require("../controllers/userController");
+const { getProfile, getUserById, updateProfile } = require("../controllers/userController");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// GET: User Profile (Protected)
+router.get("/:id", getUserById);
 router.get("/profile", protect, getProfile);
+router.put("/profile", protect, updateProfile);
 
 // POST: Logout (Protected)
 router.post("/logout", protect, (req, res) => {
