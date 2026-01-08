@@ -16,6 +16,10 @@ const paymentSchema = new mongoose.Schema(
       ref: "User",
     },
     amount: Number,
+    commissionAmount: {
+      type: Number,
+      default: 0
+    },
     status: {
       type: String,
       enum: ["escrow", "released", "failed"],

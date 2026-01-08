@@ -8,7 +8,10 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 
 // Stripe Webhook needs raw body before express.json()
 app.use(
@@ -31,7 +34,7 @@ app.use("/api/proposals", require("./routes/proposalRoutes"));
 app.use("/api/contact", require("./routes/contactRoutes"));
 
 app.get("/", (req, res) => {
-  res.send("Freelance Platform API is running");
+  res.send("Freelance Platform your backend is running");
 });
 
 // ERROR HANDLERS

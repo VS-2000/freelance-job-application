@@ -22,6 +22,7 @@ const createPayment = async (req, res) => {
       client: req.user._id, // From 'protect' middleware
       freelancer: freelancerId,
       amount: amount,
+      commissionAmount: amount * 0.10, // 10% commission
       status: "escrow", // Or "pending"
     });
 
@@ -73,6 +74,7 @@ const simulatePayment = async (req, res) => {
       client: req.user._id,
       freelancer: freelancerId,
       amount: amount,
+      commissionAmount: amount * 0.10, // 10% commission
       status: "escrow",
       transactionId: "DEMO-" + Date.now(),
     });

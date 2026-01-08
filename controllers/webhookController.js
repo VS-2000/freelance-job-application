@@ -15,6 +15,7 @@ const stripeWebhook = async (req, res) => {
             sig,
             process.env.STRIPE_WEBHOOK_SECRET
         );
+        console.log(`⚓ Stripe Webhook Received: ${event.type}`);
     } catch (err) {
         console.error(`Webhook Error: ${err.message}`);
         return res.status(400).send(`Webhook Error: ${err.message}`);

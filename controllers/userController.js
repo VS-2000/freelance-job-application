@@ -20,7 +20,7 @@ exports.getUserById = async (req, res) => {
       totalMoney: 0 // Spent for client, Earned for freelancer
     };
 
-    if (user.role === "client") {
+    if (user.role === "client" || user.role === "admin") {
       const jobs = await Job.find({ client: user._id });
       stats.jobsCount = jobs.length;
       stats.totalMoney = jobs

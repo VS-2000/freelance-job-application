@@ -50,7 +50,7 @@ exports.getAllJobs = async (req, res) => {
 
     const jobs = await Job.find(query).populate(
       "client",
-      "name email"
+      "name email isVerified"
     ).sort({ createdAt: -1 });
 
     res.json(jobs);
@@ -71,7 +71,7 @@ exports.getJobProposals = async (req, res) => {
 
   const proposals = await Proposal.find({ job: job._id }).populate(
     "freelancer",
-    "name email skills"
+    "name email skills isVerified"
   );
 
   res.json(proposals);
@@ -103,7 +103,7 @@ exports.acceptProposal = async (req, res) => {
 // GET single job by ID
 exports.getJobById = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id).populate("client", "name email");
+    const job = await Job.findById(req.params.id).populate("client", "name email isVerified");
     if (!job) return res.status(404).json({ message: "Job not found" });
     res.json(job);
   } catch (err) {
@@ -164,21 +164,21 @@ exports.approveWork = async (req, res) => {
 // GET my jobs (as client or freelancer)
 exports.getMyJobs = async (req, res) => {
   try {
-    const query = req.user.role === 'client'
+    const query = (req.user.role === 'client' || req.user.role === 'admin')
       ? { client: req.user._id }
       : { freelancer: req.user._id };
 
     let jobs = await Job.find(query)
       .populate("freelancer", "name skills")
-      .populate("client", "name email")
+      .populate("client", "name email isVerified")
       .sort({ createdAt: -1 });
 
     // For clients, if job is in-progress or completed, we might want the accepted bid amount
     // We can fetch this from the Proposal model if needed, or just use the job budget.
     // Let's stick to populating what we have for now.
 
-    // If client, for 'open' jobs, let's attach proposal summaries
-    if (req.user.role === 'client') {
+    // If client or admin, for 'open' jobs, let's attach proposal summaries
+    if (req.user.role === 'client' || req.user.role === 'admin') {
       const Proposal = require("../models/Proposal");
       const Payment = require("../models/Payment");
 

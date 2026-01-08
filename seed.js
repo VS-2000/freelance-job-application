@@ -10,9 +10,14 @@ const seedData = async () => {
     try {
         await connectDB();
 
-        // Clear existing data to ensure "demo" projects are removed
-        await Job.deleteMany();
-        // await User.deleteMany({ email: "demo_client@example.com" });
+        // Check if jobs already exist to prevent duplicate seeding or accidental deletion
+        const existingJobsCount = await Job.countDocuments();
+        if (existingJobsCount > 0) {
+            console.log("ℹ️  Jobs already exist in the database. Skipping seeding to prevent data loss.");
+            process.exit();
+        }
+
+        console.log("🌱 Seeding database...");
 
         // 1. Create a Demo Client if not exists
         let client = await User.findOne({ email: "demo_client@example.com" });

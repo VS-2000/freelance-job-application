@@ -41,11 +41,13 @@ exports.getPlatformStats = async (req, res) => {
     const jobsCount = await Job.countDocuments();
     const payments = await Payment.find().populate("client freelancer job");
     const totalEscrow = payments.filter(p => p.status === 'escrow').reduce((acc, p) => acc + p.amount, 0);
+    const totalRevenue = payments.reduce((acc, p) => acc + (p.commissionAmount || 0), 0);
 
     res.json({
       totalUsers: usersCount,
       totalJobs: jobsCount,
-      totalEscrow: totalEscrow
+      totalEscrow: totalEscrow,
+      totalRevenue: totalRevenue
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -17,6 +17,13 @@ exports.registerUser = async (req, res) => {
     });
   }
 
+  if (role === "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Direct registration as Admin is not allowed.",
+    });
+  }
+
   const user = await User.create({
     name,
     email,
@@ -31,6 +38,7 @@ exports.registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       role: user.role,
+      isVerified: user.isVerified,
       token: generateToken(user._id),
     },
   });
@@ -49,6 +57,7 @@ exports.loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         role: user.role,
+        isVerified: user.isVerified,
         token: generateToken(user._id),
       },
     });
