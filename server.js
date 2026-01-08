@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://freelance-job-application-devlance.vercel.app/",
   credentials: true,
 }));
 
