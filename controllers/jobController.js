@@ -109,14 +109,12 @@ exports.getJobById = async (req, res) => {
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    // Attach payment info if user is involved
+    // Attach payment info
     let paymentStatus = "none";
-    if (req.user) {
-      const Payment = require("../models/Payment");
-      const payment = await Payment.findOne({ job: job._id });
-      if (payment) {
-        paymentStatus = payment.status;
-      }
+    const Payment = require("../models/Payment");
+    const payment = await Payment.findOne({ job: job._id });
+    if (payment) {
+      paymentStatus = payment.status;
     }
 
     res.json({ ...job.toObject(), paymentStatus });
