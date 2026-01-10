@@ -47,7 +47,7 @@ const path = require("path");
 // Serve frontend if running in production (optional but good practice)
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/freelance-job-platform/dist')));
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../frontend', 'freelance-job-platform', 'dist', 'index.html'));
   });
 }
