@@ -1,5 +1,5 @@
 const express = require("express");
-const { createPayment } = require("../controllers/paymentController");
+const { createPayment, simulatePayment } = require("../controllers/paymentController");
 const { stripeWebhook } = require("../controllers/webhookController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -12,6 +12,6 @@ router.post("/create", protect, createPayment);
 router.post("/webhook", stripeWebhook);
 
 // SIMULATE PAYMENT (DEMO)
-router.post("/simulate", protect, createPayment.simulatePayment || require("../controllers/paymentController").simulatePayment);
+router.post("/simulate", protect, simulatePayment);
 
 module.exports = router;
