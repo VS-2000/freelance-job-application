@@ -103,9 +103,23 @@ exports.acceptProposal = async (req, res) => {
 // GET single job by ID
 exports.getJobById = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id).populate("client", "name email isVerified");
+    const job = await Job.findById(req.params.id)
+      .populate("client", "name email isVerified")
+      .populate("freelancer", "name email isVerified");
+
     if (!job) return res.status(404).json({ message: "Job not found" });
-    res.json(job);
+
+    // Attach payment info if user is involved
+    let paymentStatus = "none";
+    if (req.user) {
+      const Payment = require("../models/Payment");
+      const payment = await Payment.findOne({ job: job._id });
+      if (payment) {
+        paymentStatus = payment.status;
+      }
+    }
+
+    res.json({ ...job.toObject(), paymentStatus });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

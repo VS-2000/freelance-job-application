@@ -7,13 +7,23 @@ const Payment = require("../models/Payment");
  */
 const createPayment = async (req, res) => {
   try {
-    const { amount, jobId, freelancerId } = req.body;
+    const { amount, jobId } = req.body;
+    let { freelancerId } = req.body;
+    const Job = require("../models/Job");
 
     if (!amount || !jobId) {
       return res.status(400).json({
         success: false,
         message: "Payment amount and Job ID are required",
       });
+    }
+
+    // Automatically get freelancerId if missing
+    if (!freelancerId) {
+      const job = await Job.findById(jobId);
+      if (job && job.freelancer) {
+        freelancerId = job.freelancer;
+      }
     }
 
     // 1. Create a "pending" payment record in our DB first
@@ -58,7 +68,8 @@ const createPayment = async (req, res) => {
  */
 const simulatePayment = async (req, res) => {
   try {
-    const { amount, jobId, freelancerId } = req.body;
+    const { amount, jobId } = req.body;
+    let { freelancerId } = req.body;
     const Job = require("../models/Job");
 
     if (!amount || !jobId) {
@@ -66,6 +77,14 @@ const simulatePayment = async (req, res) => {
         success: false,
         message: "Payment amount and Job ID are required",
       });
+    }
+
+    // Automatically get freelancerId if missing
+    if (!freelancerId) {
+      const job = await Job.findById(jobId);
+      if (job && job.freelancer) {
+        freelancerId = job.freelancer;
+      }
     }
 
     // 1. Create an "escrow" payment record
