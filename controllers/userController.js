@@ -11,6 +11,7 @@ exports.getProfile = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const Job = require("../models/Job");
+    const Payment = require("../models/Payment");
     const user = await User.findById(req.params.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -23,13 +24,24 @@ exports.getUserById = async (req, res) => {
     if (user.role === "client" || user.role === "admin") {
       const jobs = await Job.find({ client: user._id });
       stats.jobsCount = jobs.length;
-      stats.totalMoney = jobs
-        .filter(j => j.status === 'completed' || j.status === 'in-progress')
-        .reduce((acc, curr) => acc + (curr.budget || 0), 0);
+
+      const payments = await Payment.find({
+        client: user._id,
+        status: { $in: ["escrow", "released"] }
+      });
+      stats.totalMoney = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
     } else if (user.role === "freelancer") {
-      const jobs = await Job.find({ freelancer: user._id, status: 'completed' });
+      const jobs = await Job.find({
+        freelancer: user._id,
+        status: { $in: ["completed", "in-progress"] }
+      });
       stats.jobsCount = jobs.length;
-      stats.totalMoney = jobs.reduce((acc, curr) => acc + (curr.budget || 0), 0);
+
+      const payments = await Payment.find({
+        freelancer: user._id,
+        status: { $in: ["escrow", "released"] }
+      });
+      stats.totalMoney = payments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
     }
 
     res.json({ ...user.toObject(), stats });
