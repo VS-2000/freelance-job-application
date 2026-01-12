@@ -9,6 +9,10 @@ const {
     deleteJob,
     updatePaymentStatus
 } = require("../controllers/adminController");
+const {
+    getCommissionData,
+    withdrawCommission
+} = require("../controllers/commissionController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -23,5 +27,9 @@ router.get("/jobs", protect, adminOnly, getAllJobsAdmin);
 router.delete("/jobs/:id", protect, adminOnly, deleteJob);
 
 router.get("/my-jobs", protect, adminOnly, require("../controllers/adminController").getMyAdminJobs);
+
+// Commission Withdrawal routes
+router.get("/commission", protect, adminOnly, getCommissionData);
+router.post("/withdraw", protect, adminOnly, withdrawCommission);
 
 module.exports = router;

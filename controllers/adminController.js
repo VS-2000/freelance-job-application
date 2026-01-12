@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Job = require("../models/Job");
 const Payment = require("../models/Payment");
+const CommissionWithdrawal = require("../models/CommissionWithdrawal");
 
 // Verify user (Freelancer or Client)
 exports.verifyUser = async (req, res) => {
@@ -43,11 +44,17 @@ exports.getPlatformStats = async (req, res) => {
     const totalEscrow = payments.filter(p => p.status === 'escrow').reduce((acc, p) => acc + p.amount, 0);
     const totalRevenue = payments.reduce((acc, p) => acc + (p.commissionAmount || 0), 0);
 
+    const withdrawals = await CommissionWithdrawal.find();
+    const totalWithdrawn = withdrawals.reduce((acc, w) => acc + w.amount, 0);
+    const currentBalance = totalRevenue - totalWithdrawn;
+
     res.json({
       totalUsers: usersCount,
       totalJobs: jobsCount,
       totalEscrow: totalEscrow,
-      totalRevenue: totalRevenue
+      totalRevenue: totalRevenue,
+      totalWithdrawn: totalWithdrawn,
+      currentBalance: currentBalance
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
