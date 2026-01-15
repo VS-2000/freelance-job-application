@@ -1,10 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cronJobs = require("./utils/cronJobs");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
 dotenv.config();
 connectDB();
+cronJobs();
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
 app.use("/api/proposals", require("./routes/proposalRoutes"));
 app.use("/api/contact", require("./routes/contactRoutes"));
+app.use("/api/wallet", require("./routes/walletRoutes"));
 
 app.get("/", (req, res) => {
   res.send("Freelance Platform your backend is running");

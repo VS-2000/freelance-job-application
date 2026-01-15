@@ -162,10 +162,20 @@ exports.approveWork = async (req, res) => {
 
     // Update payment record to released
     const Payment = require("../models/Payment");
-    await Payment.findOneAndUpdate(
+    const payment = await Payment.findOneAndUpdate(
       { job: job._id, status: "escrow" },
-      { status: "released" }
+      { status: "released" },
+      { new: true }
     );
+
+    if (payment) {
+      // Update freelancer's wallet balance (amount minus commission)
+      const User = require("../models/User");
+      const earnedAmount = payment.amount - (payment.commissionAmount || 0);
+      await User.findByIdAndUpdate(job.freelancer, {
+        $inc: { walletBalance: earnedAmount }
+      });
+    }
 
     res.json({ message: "Job completed and funds released", job });
   } catch (err) {

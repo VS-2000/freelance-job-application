@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 
+
+
     role: {
       type: String,
       enum: ["admin", "client", "freelancer"],
@@ -36,6 +38,11 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+
+    walletBalance: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

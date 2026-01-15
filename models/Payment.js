@@ -22,7 +22,7 @@ const paymentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["escrow", "released", "failed"],
+      enum: ["escrow", "released", "failed", "refunded"],
       default: "escrow",
     },
   },
