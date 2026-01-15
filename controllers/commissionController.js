@@ -13,7 +13,7 @@ exports.getCommissionData = async (req, res) => {
         const currentBalance = totalRevenue - totalWithdrawn;
 
         res.json({
-            totalRevenue,
+            totalEarned: totalRevenue,
             totalWithdrawn,
             currentBalance,
             withdrawals
@@ -26,7 +26,7 @@ exports.getCommissionData = async (req, res) => {
 // Withdraw commission
 exports.withdrawCommission = async (req, res) => {
     try {
-        const { amount, bankDetails } = req.body;
+        const { amount, method, details } = req.body;
 
         if (!amount || amount <= 0) {
             return res.status(400).json({ message: "Invalid withdrawal amount" });
@@ -48,7 +48,8 @@ exports.withdrawCommission = async (req, res) => {
         const withdrawal = new CommissionWithdrawal({
             admin: req.user._id,
             amount,
-            bankDetails,
+            method, // Pass the structured method object directly
+            details, // Pass the structured details object directly
             status: "completed" // Simulating instant completion
         });
 

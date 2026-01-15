@@ -16,8 +16,16 @@ const commissionWithdrawalSchema = new mongoose.Schema(
             enum: ["pending", "completed", "failed"],
             default: "completed", // Simulating instant completion for now
         },
-        bankDetails: {
-            type: String, // Or Object for more detail
+        method: {
+            type: String,
+            enum: ["bank", "upi"],
+            default: "bank",
+        },
+        details: {
+            accountNumber: String,
+            ifscCode: String,
+            bankName: String,
+            upiId: String,
         },
     },
     { timestamps: true }
