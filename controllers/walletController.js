@@ -51,7 +51,7 @@ exports.requestWithdrawal = async (req, res) => {
             amount,
             method,
             details,
-            status: "pending"
+            status: "completed"
         });
 
         // 2. Deduct from wallet balance immediately (or mark as pending)
