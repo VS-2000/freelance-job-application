@@ -21,15 +21,26 @@ exports.verifyUser = async (req, res) => {
   }
 };
 
-// Delete user
+// Toggle user active status (Soft delete)
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Note: In a real app, you might want to delete related jobs/proposals/messages
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: "User deleted successfully" });
+    if (user.role === "admin") {
+      return res.status(403).json({ message: "Cannot deactivate an admin" });
+    }
+
+    user.isActive = user.isActive === false ? true : false;
+    await user.save();
+
+    res.json({
+      message: `User ${user.isActive ? "activated" : "deactivated"} successfully`,
+      user: {
+        _id: user._id,
+        isActive: user.isActive
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
